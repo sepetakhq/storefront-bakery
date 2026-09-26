@@ -18,6 +18,14 @@ describe('manifest.json', () => {
     expect(manifest.description.en.trim().length).toBeGreaterThan(0);
   });
 
+  // A fork inherits its parent's manifest; publishing that one lists this
+  // template in the catalogue under the parent's name and pitch.
+  it("carries this template's name, not the one it was forked from", () => {
+    const pkg = JSON.parse(readFileSync(resolve(dir, '../package.json'), 'utf8'));
+    const template = pkg.scripts['publish:local'].match(/SF_TEMPLATE=([\w-]+)/)[1];
+    expect(manifest.title.toLowerCase()).toContain(template);
+  });
+
   it('points at a preview that ships with it', () => {
     expect(manifest.preview).toMatch(/^[\w.-]+$/);
     expect(existsSync(resolve(dir, manifest.preview))).toBe(true);
