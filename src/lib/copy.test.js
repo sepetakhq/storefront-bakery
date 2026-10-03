@@ -202,6 +202,21 @@ describe('heroChips', () => {
       ['Aman', 'QRIS · BCA VA'],
     ]);
   });
+  // VA BCA and Transfer BCA are one badge, so the three slots go to three
+  // different marks; a name without a badge stays in the line as text.
+  it("carries the server's badges, one per badge, for the line to draw", () => {
+    const bca = 'http://api.test/logos/payment/bca.svg';
+    const chips = heroChips(config({
+      paymentMethods: [
+        { code: 'BCA', name: 'VA BCA', enabled: true, logo_url: bca },
+        { code: 'MANUAL_BCA', name: 'Transfer BCA', enabled: true, logo_url: bca },
+        { code: 'MANUAL_BANK_1', name: 'Transfer SeaBank', enabled: true },
+        { code: 'QRIS', name: 'QRIS', enabled: true, logo_url: 'http://api.test/logos/payment/qris.svg' },
+      ],
+    }));
+    expect(chips[2].items.map((p) => p.name)).toEqual(['VA BCA', 'Transfer SeaBank', 'QRIS']);
+    expect(chips[2].sub).toBe('VA BCA · Transfer SeaBank · QRIS');
+  });
   it('leaves out a part with nothing behind it', () => {
     expect(heroChips({})).toEqual([]);
     expect(heroChips({ paymentMethods: [{ enabled: false, name: 'x' }], couriers: [] })).toEqual([]);

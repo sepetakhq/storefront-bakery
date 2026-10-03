@@ -178,22 +178,34 @@ export function campaignDiscount(c) {
  */
 export function heroChips({ brand, copy, freeShipping, paymentMethods = [], couriers = [] } = {}) {
   const sections = brand?.sections;
-  const chips = [];
+  const out = [];
   if (freeShipping && copy) {
     // Through the config's substitution, so {free_shipping_min} is the
     // shop's threshold; a note it withholds takes the chip with it.
     const note = copy(sectionText(sections, 'hero_chip_shipping_note'));
-    if (note) chips.push({ icon: 'truck', title: sectionText(sections, 'hero_chip_shipping'), sub: note });
+    if (note) out.push({ icon: 'truck', title: sectionText(sections, 'hero_chip_shipping'), sub: note });
   }
-  const ships = couriers.filter((c) => c?.enabled && c?.name);
+  // `items` carries the server's badges, so the line can draw a logo where
+  // there is one and the name where there is not.
+  const ships = chips(couriers.filter((c) => c?.enabled && c?.name)).slice(0, 3);
   if (ships.length) {
-    chips.push({ icon: 'box', title: sectionText(sections, 'hero_chip_couriers'), sub: ships.slice(0, 3).map((c) => c.name).join(' · ') });
+    out.push({ icon: 'box', title: sectionText(sections, 'hero_chip_couriers'), sub: ships.map((c) => c.name).join(' · '), items: ships });
   }
-  const pays = paymentMethods.filter((p) => p?.enabled && p?.name);
+  const pays = chips(paymentMethods.filter((p) => p?.enabled && p?.name)).slice(0, 3);
   if (pays.length) {
-    chips.push({ icon: 'card', title: sectionText(sections, 'hero_chip_payment'), sub: pays.slice(0, 3).map((p) => p.name).join(' · ') });
+    out.push({ icon: 'card', title: sectionText(sections, 'hero_chip_payment'), sub: pays.map((p) => p.name).join(' · '), items: pays });
   }
-  return chips;
+  return out;
+}
+
+/**
+ * One entry per badge: "VA BCA" and "Transfer BCA", or JNE REG and JNE YES,
+ * are the same mark to a buyer checking whether the shop takes their bank or
+ * ships with their courier. A name the platform has no badge for stays text.
+ */
+export function chips(items) {
+  const seen = new Set();
+  return items.filter((x) => !x.logo_url || (!seen.has(x.logo_url) && seen.add(x.logo_url)));
 }
 
 /**

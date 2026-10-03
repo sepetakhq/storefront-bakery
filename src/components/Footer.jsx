@@ -5,7 +5,7 @@ import { useCategories } from '@sepetakhq/storefront-kit/hooks/queries';
 
 import { BrandMark } from './BrandMark.jsx';
 import Icon, { ICONS } from '../ui/Icon.jsx';
-import { footerLinks, originLine, sectionText, socialAbbr, socialLabel } from '../lib/copy.js';
+import { chips, footerLinks, originLine, sectionText, socialAbbr, socialLabel } from '../lib/copy.js';
 
 /**
  * The design's light footer, from config alone: the mark, tagline and
@@ -121,10 +121,8 @@ export default function Footer() {
               <div className="bk-footer-col" style={{ gap: 10 }}>
                 <h4>{s('footer_payment_heading')}</h4>
                 <div className="bk-footer-chips">
-                  {payments.map((m) => (
-                    <span key={m.code} className="bk-footer-chip">
-                      {m.name}
-                    </span>
+                  {chips(payments).map((m) => (
+                    <Chip key={m.code} item={m} />
                   ))}
                 </div>
               </div>
@@ -133,10 +131,8 @@ export default function Footer() {
               <div className="bk-footer-col" style={{ gap: 10 }}>
                 <h4>{s('footer_shipping_heading')}</h4>
                 <div className="bk-footer-chips">
-                  {ships.map((c) => (
-                    <span key={c.code} className="bk-footer-chip">
-                      {c.name}
-                    </span>
+                  {chips(ships).map((c, i) => (
+                    <Chip key={`${c.code}-${i}`} item={c} />
                   ))}
                 </div>
               </div>
@@ -154,5 +150,14 @@ export default function Footer() {
         </div>
       )}
     </footer>
+  );
+}
+
+function Chip({ item }) {
+  if (!item.logo_url) return <span className="bk-footer-chip">{item.name}</span>;
+  return (
+    <span className="bk-footer-chip bk-logo-chip" title={item.name}>
+      <img src={item.logo_url} alt={item.name} loading="lazy" />
+    </span>
   );
 }

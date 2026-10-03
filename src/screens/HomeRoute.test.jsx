@@ -99,6 +99,19 @@ describe('HomeRoute', () => {
     expect(screen.queryByText('Gratis ongkir')).toBeNull();
   });
 
+  it("draws the server's badge in the hero chip line, and the name where it sends none", () => {
+    const { container } = setup([HERO], {}, {
+      paymentMethods: [
+        { code: 'BCA', name: 'VA BCA', enabled: true, logo_url: 'http://api.test/logos/payment/bca.svg' },
+        { code: 'MANUAL_BANK_1', name: 'Transfer SeaBank', enabled: true },
+      ],
+      couriers: [{ code: 'jne', name: 'JNE', enabled: true, logo_url: 'http://api.test/logos/courier/jne.svg' }],
+    });
+    const imgs = [...container.querySelectorAll('img.bk-chip-logo')];
+    expect(imgs.map((i) => i.getAttribute('alt'))).toEqual(['JNE', 'VA BCA']);
+    expect(screen.getByText(/Transfer SeaBank/)).toBeTruthy();
+  });
+
   it('draws each feature mark as typed, and a heart for none', () => {
     const { container } = setup([
       { id: 'f', type: 'features', features: { title: 'Kenapa kami', items: [{ mark: '01', title: 'Alami', body: 'Butter asli.' }, { mark: '24j', title: 'Cepat' }, { mark: '', title: 'Tanpa' }] } },
