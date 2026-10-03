@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -163,7 +163,18 @@ function Hero({ hero, hasCats }) {
                   </span>
                   <span style={{ minWidth: 0 }}>
                     <b>{c.title}</b>
-                    {c.sub && <span className="bk-chip-sub">{c.sub}</span>}
+                    {c.sub && (
+                      <span className="bk-chip-sub">
+                        {c.items
+                          ? c.items.map((x, i) => (
+                              <Fragment key={`${x.code}-${i}`}>
+                                {i > 0 ? ' · ' : null}
+                                {x.logo_url ? <img className="bk-chip-logo" src={x.logo_url} alt={x.name} title={x.name} loading="lazy" /> : x.name}
+                              </Fragment>
+                            ))
+                          : c.sub}
+                      </span>
+                    )}
                   </span>
                 </li>
               ))}
