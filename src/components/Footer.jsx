@@ -16,7 +16,10 @@ import { chips, footerLinks, originLine, sectionText, socialAbbr, socialLabel } 
  * nothing.
  */
 export default function Footer() {
-  const { brand, paymentMethods, couriers } = useConfig();
+  const { brand, paymentMethods, couriers, tenant } = useConfig();
+  // The platform's mark, on the plans that carry it. Absent on an older API
+  // version, which strips the field, so nothing is drawn.
+  const badge = tenant?.sepetak_badge === true;
   const { data: categories } = useCategories();
   const payments = (paymentMethods ?? []).filter((m) => m.enabled && m.name);
   const ships = (couriers ?? []).filter((c) => c.enabled && c.name);
@@ -141,10 +144,17 @@ export default function Footer() {
         )}
       </div>
 
-      {(brand.copyright || origin) && (
+      {(brand.copyright || origin || badge) && (
         <div className="bk-footer-bottom">
           <div>
-            <span>{brand.copyright || ''}</span>
+            <span className="bk-footer-sign">
+              {brand.copyright && <span>{brand.copyright}</span>}
+              {badge && (
+                <a href="https://sepetak.com/?ref=toko" target="_blank" rel="noopener" className="bk-footer-badge">
+                  Dibuat dengan Sepetak
+                </a>
+              )}
+            </span>
             {origin && <span>{origin}</span>}
           </div>
         </div>
